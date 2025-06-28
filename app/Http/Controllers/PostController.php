@@ -3,39 +3,56 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PostSaveRequest;
-use App\Http\Resources\PostResource;
 use App\Models\Post;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection as ARC;
-use Illuminate\Http\Response;
+use App\Models\User;
 
 class PostController extends Controller
 {
-    public function index(): ARC
+    public function index()
     {
-        $posts = Post::with('user')->paginate(10);
-        return PostResource::collection($posts);
+        $posts = Post::with('user')->orderByDesc('updated_at')->paginate(10);
+        return view('posts.index', compact('posts'));
     }
 
-    public function store(PostSaveRequest $request): PostResource
+    public function create()
     {
-        $post=Post::create($request->validated());
-        return PostResource::make($post);
+        $users = User::all();
+        return view('posts.create', compact('users'));
     }
 
-    public function show(Post $post): PostResource
+    public function store(PostSaveRequest $request)
     {
-        return PostResource::make($post);
+        Post::create($request->validated());
+
+        return redirect()->route('posts.index')
+            ->with('success', 'Post created successfully.');
     }
 
-    public function update(PostSaveRequest $request, Post $post): PostResource
+    public function show(Post $post)
+    {
+        $post->load('user');
+        return view('posts.show', compact('post'));
+    }
+
+    public function edit(Post $post)
+    {
+        $users = User::all();
+        return view('posts.edit', compact('post', 'users'));
+    }
+
+    public function update(PostSaveRequest $request, Post $post)
     {
         $post->update($request->validated());
-        return PostResource::make($post);
+
+        return redirect()->route('posts.index')
+            ->with('success', 'Post updated successfully.');
     }
 
-    public function destroy(Post $post): Response
+    public function destroy(Post $post)
     {
         $post->delete();
-        return response()->noContent();
+
+        return redirect()->route('posts.index')
+            ->with('success', 'Post deleted successfully.');
     }
 }

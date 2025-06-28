@@ -12,7 +12,7 @@ class PostFactory extends Factory
         return [
             'user_id'=>$this->faker->randomElement(User::all()),
             'title'=>$this->faker->word(),
-            'text'=>$this->faker->text()
+            'content'=>$this->faker->text()
         ];
     }
 }
