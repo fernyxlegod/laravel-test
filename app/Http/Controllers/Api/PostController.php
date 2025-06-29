@@ -25,7 +25,7 @@ class PostController extends Controller
 
     public function show(Post $post): PostResource
     {
-        return PostResource::make($post);
+        return PostResource::make($post->load('user'));
     }
 
     public function update(PostSaveRequest $request, Post $post): PostResource
