@@ -55,4 +55,19 @@ class PostController extends Controller
         return redirect()->route('posts.index')
             ->with('success', 'Post deleted successfully.');
     }
+
+    public function showUser(User $user)
+    {
+        $user->load(['posts' => function($query) {
+            $query->orderBy('updated_at', 'desc');
+        }]);
+
+        return view('users.show', compact('user'));
+    }
+
+    public function indexUsers()
+    {
+        $users = User::withCount('posts')->orderBy('name')->paginate(10);
+        return view('users.index', compact('users'));
+    }
 }
